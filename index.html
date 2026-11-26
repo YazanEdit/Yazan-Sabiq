@@ -24,6 +24,7 @@
     color: var(--text);
     line-height: 1.8;
   }
+  section[id] { scroll-margin-top: 86px; }
   .wrap { max-width: 1050px; margin: auto; padding: 0 6%; }
 
   /* ===== شاشة الدخول ===== */
@@ -139,14 +140,41 @@
     align-items: center;
     height: 76px;
   }
+  nav {
+    display: flex;
+    align-items: center;
+  }
   nav a {
+    position: relative;
     color: var(--cream);
     text-decoration: none;
     font-weight: 600;
     margin-right: 28px;
-    transition: opacity 0.3s;
+    padding: 6px 0;
+    opacity: 0.85;
+    transition: opacity 0.35s ease, transform 0.35s ease;
   }
-  nav a:hover { opacity: 0.6; }
+  nav a::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--cream);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  nav a:hover,
+  nav a.active {
+    opacity: 1;
+  }
+  nav a:hover::after,
+  nav a.active::after {
+    transform: scaleX(1);
+  }
 
   /* ===== شاشة الافتتاح ===== */
   #hero {
@@ -383,8 +411,33 @@
   }
 
   /* ===== حركة الظهور ===== */
-  .fade { opacity: 0; transform: translateY(28px); transition: 0.75s ease; }
-  .fade.show { opacity: 1; transform: none; }
+  .fade {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .fade.show {
+    opacity: 1;
+    transform: none;
+  }
+  .fade.nav-glide {
+    transform: translateY(12px);
+    transition-duration: 1.05s;
+  }
+  .fade.nav-glide.show {
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .fade, .fade.nav-glide {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    nav a::after { transition: none; }
+  }
 
   @media (max-width: 760px) {
     .about-grid { grid-template-columns: 1fr; gap: 32px; }
@@ -575,35 +628,64 @@
     setTimeout(finish, reduce ? 1500 : total);
   })();
 
-  // ===== حركة الظهور المتكررة عند النزول والتنقل بين القوائم =====
+  // ===== حركة الظهور المريحة والتنقل بين القوائم =====
   const fades = document.querySelectorAll('.fade');
+  const navLinks = document.querySelectorAll('header nav a');
+  let navGlideTimer = null;
+
+  function setActiveNav(hash) {
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === hash);
+    });
+  }
+
   const io = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (e.isIntersecting) {
         e.target.classList.add('show');
-      } else {
+        const parentSection = e.target.closest('section[id]');
+        if (parentSection) {
+          setActiveNav('#' + parentSection.id);
+        }
+      } else if (!e.target.classList.contains('nav-glide')) {
         e.target.classList.remove('show');
       }
     });
-  }, { threshold: 0.12 });
+  }, { threshold: 0.14 });
   fades.forEach(el => io.observe(el));
 
-  function replayFade(targetSelector) {
+  function softGlideToSection(targetSelector) {
     const section = document.querySelector(targetSelector);
     if (!section) return;
     const fadeEl = section.querySelector('.fade');
+    setActiveNav(targetSelector);
     if (!fadeEl) return;
+
+    clearTimeout(navGlideTimer);
+    fadeEl.classList.add('nav-glide');
     fadeEl.classList.remove('show');
-    setTimeout(() => {
-      fadeEl.classList.add('show');
-    }, 180);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        fadeEl.classList.add('show');
+      });
+    });
+
+    navGlideTimer = setTimeout(() => {
+      fadeEl.classList.remove('nav-glide');
+    }, 1150);
   }
 
   document.querySelectorAll('header nav a, #hero a.btn').forEach(link => {
-    link.addEventListener('click', () => {
+    link.addEventListener('click', (e) => {
       const href = link.getAttribute('href');
       if (href && href.startsWith('#')) {
-        replayFade(href);
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        softGlideToSection(href);
       }
     });
   });
@@ -632,4 +714,4 @@
 </html>
 ```[cite: 1, 2, 3]
 
-إذا بقي حجم الشعار صغيراً بسبب هوامش بيضاء داخل نفس ملف الصورة، هل تحب أن أقول لك كيف تقص الفراغ المحيط بالشعار بسهولة قبل رفعه؟
+بعد تجربة الضغط على القوائم في هذا التحديث، هل الانسيابية أصبحت مريحة أكثر بالنسبة لك؟
