@@ -493,18 +493,20 @@
     opacity: 0.95;
   }
 
-  /* ===== أنيميشن fade-up عند النزول و fade-down عند الطلوع فقط ===== */
+  /* ===== أنيميشن fade-up عند النزول و fade-down عند الطلوع ===== */
   .fade {
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.75s var(--ease-fade), transform 0.75s var(--ease-fade);
+    transform: translateY(28px);
+    transition: opacity 0.8s var(--ease-fade), transform 0.8s var(--ease-fade);
     will-change: opacity, transform;
   }
-  .fade.fade-up {
-    transform: translateY(30px);
+  .fade.fade-up:not(.show) {
+    opacity: 0;
+    transform: translateY(28px);
   }
-  .fade.fade-down {
-    transform: translateY(-30px);
+  .fade.fade-down:not(.show) {
+    opacity: 0;
+    transform: translateY(-28px);
   }
   .fade.show {
     opacity: 1;
@@ -848,18 +850,20 @@
   // ===== أنيميشن fade-up عند النزول و fade-down عند الطلوع =====
   const fades = Array.from(document.querySelectorAll('.fade'));
   const navLinks = Array.from(document.querySelectorAll('header nav a'));
-  let lastScrollY = window.scrollY || window.pageYOffset || 0;
-  let scrollDir = 'down'; // 'down' => fade-up | 'up' => fade-down
+  let lastY = window.scrollY || 0;
+  let dir = 'down'; // 'down' => fade-up | 'up' => fade-down
 
-  function applyDirectionClass(el, dir) {
+  function setDirClass(el, currentDir) {
     el.classList.remove('fade-up', 'fade-down');
-    el.classList.add(dir === 'up' ? 'fade-down' : 'fade-up');
+    el.classList.add(currentDir === 'up' ? 'fade-down' : 'fade-up');
   }
 
-  function triggerFade(el, dir) {
-    applyDirectionClass(el, dir);
+  function runFade(el, currentDir) {
+    el.style.transition = 'none';
     el.classList.remove('show');
+    setDirClass(el, currentDir);
     void el.offsetWidth;
+    el.style.transition = '';
     requestAnimationFrame(() => {
       el.classList.add('show');
     });
@@ -871,46 +875,46 @@
     });
   }
 
-  function handleScrollDirectionAndFades() {
-    const currentY = window.scrollY || window.pageYOffset || 0;
-    if (currentY > lastScrollY + 2) {
-      scrollDir = 'down';
-    } else if (currentY < lastScrollY - 2) {
-      scrollDir = 'up';
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY || 0;
+    if (y > lastY + 1) {
+      dir = 'down';
+    } else if (y < lastY - 1) {
+      dir = 'up';
     }
-    lastScrollY = currentY;
-    document.body.setAttribute('data-anim-dir', scrollDir);
+    lastY = y;
+    document.body.setAttribute('data-anim-dir', dir);
 
     const vh = window.innerHeight || document.documentElement.clientHeight;
-    fades.forEach(el => {
-      const rect = el.getBoundingClientRect();
-      const visible = rect.top < vh * 0.88 && rect.bottom > vh * 0.08;
-      const offscreen = rect.top > vh || rect.bottom < 0;
-
-      if (visible) {
-        if (!el.classList.contains('show')) {
-          triggerFade(el, scrollDir);
-        }
-        const sec = el.closest('section[id]');
-        if (sec && rect.top < vh * 0.5) {
-          setActiveNav('#' + sec.id);
-        }
-      } else if (offscreen && el.id !== 'hero') {
-        el.classList.remove('show');
-        applyDirectionClass(el, scrollDir);
+    document.querySelectorAll('section[id]').forEach(sec => {
+      const r = sec.getBoundingClientRect();
+      if (r.top <= vh * 0.45 && r.bottom >= vh * 0.2) {
+        setActiveNav('#' + sec.id);
       }
     });
-  }
+  }, { passive: true });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const el = entry.target;
+      if (entry.isIntersecting) {
+        runFade(el, dir);
+      } else if (el.id !== 'hero') {
+        el.classList.remove('show');
+        setDirClass(el, dir);
+      }
+    });
+  }, {
+    threshold: 0.12,
+    rootMargin: '0px 0px -40px 0px'
+  });
 
   fades.forEach(el => {
     if (!el.classList.contains('show')) {
-      applyDirectionClass(el, 'down');
+      setDirClass(el, 'down');
     }
+    observer.observe(el);
   });
-
-  window.addEventListener('scroll', handleScrollDirectionAndFades, { passive: true });
-  window.addEventListener('resize', handleScrollDirectionAndFades, { passive: true });
-  setTimeout(handleScrollDirectionAndFades, 120);
 
   document.querySelectorAll('header nav a, #hero a.btn').forEach(link => {
     link.addEventListener('click', (e) => {
@@ -922,20 +926,18 @@
       e.preventDefault();
       setActiveNav(href);
 
-      const targetTop = targetSec.getBoundingClientRect().top + (window.scrollY || 0);
-      const currentY = window.scrollY || 0;
-      scrollDir = targetTop < currentY ? 'up' : 'down';
-      document.body.setAttribute('data-anim-dir', scrollDir);
+      const targetY = targetSec.getBoundingClientRect().top + (window.scrollY || 0);
+      const nowY = window.scrollY || 0;
+      dir = targetY < nowY ? 'up' : 'down';
+      document.body.setAttribute('data-anim-dir', dir);
 
       targetSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       const fadeEl = targetSec.querySelector('.fade');
       if (fadeEl) {
-        fadeEl.classList.remove('show');
-        applyDirectionClass(fadeEl, scrollDir);
         setTimeout(() => {
-          triggerFade(fadeEl, scrollDir);
-        }, 200);
+          runFade(fadeEl, dir);
+        }, 260);
       }
     });
   });
@@ -955,9 +957,8 @@
         if (p < 1) requestAnimationFrame(tick);
       }
       requestAnimationFrame(tick);
-      counter.unobserve(el);
     });
-  }, { threshold: 0.4 });
+  }, { threshold: 0.35 });
   document.querySelectorAll('.count').forEach(el => counter.observe(el));
 </script>
 </body>
