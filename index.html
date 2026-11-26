@@ -152,7 +152,7 @@
     margin-right: 28px;
     padding: 6px 0;
     opacity: 0.85;
-    transition: opacity 0.35s ease, transform 0.35s ease;
+    transition: opacity 0.4s ease;
   }
   nav a::after {
     content: '';
@@ -165,7 +165,7 @@
     border-radius: 2px;
     transform: scaleX(0);
     transform-origin: right;
-    transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.45s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
   nav a:hover,
   nav a.active {
@@ -211,9 +211,9 @@
     text-decoration: none;
     font-weight: 700;
     font-size: 1.05rem;
-    transition: background 0.3s, transform 0.3s;
+    transition: background 0.35s ease, transform 0.35s ease;
   }
-  .btn:hover { background: var(--olive-dark); transform: scale(1.04); }
+  .btn:hover { background: var(--olive-dark); transform: scale(1.03); }
   .btn.ghost {
     background: transparent;
     color: var(--olive);
@@ -225,11 +225,11 @@
     margin-top: 56px;
     color: var(--olive);
     opacity: 0.6;
-    animation: bounce 2s infinite;
+    animation: bounce 2.4s ease-in-out infinite;
   }
   @keyframes bounce {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(8px); }
+    50% { transform: translateY(7px); }
   }
 
   /* ===== الأرقام ===== */
@@ -286,9 +286,9 @@
     border: 1px solid rgba(247, 243, 232, 0.3);
     border-radius: 14px;
     padding: 22px 24px;
-    transition: background 0.3s;
+    transition: background 0.35s ease, transform 0.35s ease;
   }
-  .fact:hover { background: rgba(247, 243, 232, 0.08); }
+  .fact:hover { background: rgba(247, 243, 232, 0.08); transform: translateY(-2px); }
   .fact strong { display: block; font-size: 1.5rem; }
   .fact span { opacity: 0.8; font-size: 0.95rem; }
 
@@ -305,12 +305,12 @@
     overflow: hidden;
     background: var(--olive-dark);
     box-shadow: 0 10px 30px rgba(52, 58, 32, 0.15);
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease;
     cursor: pointer;
   }
   .video:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 16px 38px rgba(52, 58, 32, 0.25);
+    transform: translateY(-5px);
+    box-shadow: 0 16px 38px rgba(52, 58, 32, 0.24);
   }
   .video img, .video iframe {
     position: absolute;
@@ -325,7 +325,7 @@
     position: absolute;
     inset: 0;
     background: linear-gradient(to top, rgba(52, 58, 32, 0.55), transparent 55%);
-    transition: opacity 0.3s;
+    transition: opacity 0.35s;
   }
   .video:hover .shade { opacity: 0.4; }
   .play {
@@ -338,7 +338,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s, background 0.3s;
+    transition: transform 0.35s, background 0.35s;
   }
   .play::before {
     content: '';
@@ -347,7 +347,7 @@
     border-color: transparent transparent transparent var(--olive);
     margin-left: 4px;
   }
-  .video:hover .play { transform: scale(1.12); background: var(--cream); }
+  .video:hover .play { transform: scale(1.08); background: var(--cream); }
 
   /* ===== المشغّل ===== */
   #player {
@@ -373,8 +373,8 @@
     overflow: hidden;
     border: 2px solid var(--cream);
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
-    transform: scale(0.94);
-    transition: transform 0.35s;
+    transform: scale(0.96);
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
   #player.open .player-box { transform: scale(1); }
   .player-box iframe { width: 100%; height: 100%; border: 0; display: block; }
@@ -410,28 +410,29 @@
     opacity: 0.95;
   }
 
-  /* ===== حركة الظهور ===== */
+  /* ===== حركة الظهور المريحة والهادئة ===== */
   .fade {
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: opacity, transform;
+    transform: translateY(16px);
+    transition: opacity 0.95s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.95s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
   .fade.show {
     opacity: 1;
     transform: none;
   }
-  .fade.nav-glide {
-    transform: translateY(12px);
-    transition-duration: 1.05s;
+  .fade.calm-pulse {
+    opacity: 0.45;
+    transform: translateY(10px);
+    transition: opacity 0.9s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.9s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
-  .fade.nav-glide.show {
+  .fade.calm-pulse.show {
+    opacity: 1;
     transform: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .fade, .fade.nav-glide {
+    .fade, .fade.calm-pulse {
       opacity: 1;
       transform: none;
       transition: none;
@@ -628,10 +629,10 @@
     setTimeout(finish, reduce ? 1500 : total);
   })();
 
-  // ===== حركة الظهور المريحة والتنقل بين القوائم =====
-  const fades = document.querySelectorAll('.fade');
-  const navLinks = document.querySelectorAll('header nav a');
-  let navGlideTimer = null;
+  // ===== حركة الظهور الهادئة والتنقل بين القوائم =====
+  const fades = Array.from(document.querySelectorAll('.fade'));
+  const navLinks = Array.from(document.querySelectorAll('header nav a'));
+  let calmTimer = null;
 
   function setActiveNav(hash) {
     navLinks.forEach(a => {
@@ -639,41 +640,62 @@
     });
   }
 
+  function revealVisibleFades() {
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    fades.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < vh * 0.9 && rect.bottom > vh * 0.05) {
+        el.classList.add('show');
+        const sec = el.closest('section[id]');
+        if (sec && rect.top < vh * 0.55) {
+          setActiveNav('#' + sec.id);
+        }
+      } else if (!el.classList.contains('calm-pulse') && (rect.top > vh || rect.bottom < 0)) {
+        el.classList.remove('show');
+      }
+    });
+  }
+
   const io = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (e.isIntersecting) {
         e.target.classList.add('show');
-        const parentSection = e.target.closest('section[id]');
-        if (parentSection) {
-          setActiveNav('#' + parentSection.id);
-        }
-      } else if (!e.target.classList.contains('nav-glide')) {
+        const sec = e.target.closest('section[id]');
+        if (sec) setActiveNav('#' + sec.id);
+      } else if (!e.target.classList.contains('calm-pulse')) {
         e.target.classList.remove('show');
       }
     });
-  }, { threshold: 0.14 });
-  fades.forEach(el => io.observe(el));
+  }, { threshold: 0.08 });
 
-  function softGlideToSection(targetSelector) {
-    const section = document.querySelector(targetSelector);
-    if (!section) return;
-    const fadeEl = section.querySelector('.fade');
+  fades.forEach(el => io.observe(el));
+  window.addEventListener('scroll', revealVisibleFades, { passive: true });
+  window.addEventListener('resize', revealVisibleFades, { passive: true });
+  setTimeout(revealVisibleFades, 120);
+
+  function calmNavigate(targetSelector) {
+    const target = document.querySelector(targetSelector);
+    if (!target) return;
     setActiveNav(targetSelector);
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    const fadeEl = target.querySelector('.fade');
     if (!fadeEl) return;
 
-    clearTimeout(navGlideTimer);
-    fadeEl.classList.add('nav-glide');
+    clearTimeout(calmTimer);
+    fades.forEach(item => item.classList.remove('calm-pulse'));
+
+    fadeEl.classList.add('calm-pulse');
     fadeEl.classList.remove('show');
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        fadeEl.classList.add('show');
-      });
-    });
+    setTimeout(() => {
+      fadeEl.classList.add('show');
+    }, 240);
 
-    navGlideTimer = setTimeout(() => {
-      fadeEl.classList.remove('nav-glide');
-    }, 1150);
+    calmTimer = setTimeout(() => {
+      fadeEl.classList.remove('calm-pulse');
+      fadeEl.classList.add('show');
+    }, 1250);
   }
 
   document.querySelectorAll('header nav a, #hero a.btn').forEach(link => {
@@ -681,11 +703,7 @@
       const href = link.getAttribute('href');
       if (href && href.startsWith('#')) {
         e.preventDefault();
-        const target = document.querySelector(href);
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        softGlideToSection(href);
+        calmNavigate(href);
       }
     });
   });
@@ -707,11 +725,8 @@
       requestAnimationFrame(tick);
       counter.unobserve(el);
     });
-  }, { threshold: 0.6 });
+  }, { threshold: 0.5 });
   document.querySelectorAll('.count').forEach(el => counter.observe(el));
 </script>
 </body>
 </html>
-```[cite: 1, 2, 3]
-
-بعد تجربة الضغط على القوائم في هذا التحديث، هل الانسيابية أصبحت مريحة أكثر بالنسبة لك؟
