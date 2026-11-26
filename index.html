@@ -203,7 +203,7 @@
     padding: 6px 0;
     opacity: 0.85;
     white-space: nowrap;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.4s ease, transform 0.35s ease;
   }
   nav a::after {
     content: '';
@@ -271,9 +271,13 @@
     text-decoration: none;
     font-weight: 700;
     font-size: 1.05rem;
-    transition: background 0.35s ease, transform 0.35s ease;
+    transition: background 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
   }
-  .btn:hover { background: var(--olive-dark); transform: scale(1.03); }
+  .btn:hover {
+    background: var(--olive-dark);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 10px 24px rgba(52, 58, 32, 0.18);
+  }
   .btn.ghost {
     background: transparent;
     color: var(--olive);
@@ -283,12 +287,13 @@
   .scroll-hint {
     margin-top: 48px;
     color: var(--olive);
-    opacity: 0.6;
+    opacity: 0.65;
+    font-size: 1.3rem;
     animation: bounce 2.4s ease-in-out infinite;
   }
   @keyframes bounce {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(7px); }
+    50% { transform: translateY(8px); }
   }
 
   /* ===== الأرقام ===== */
@@ -304,7 +309,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   }
+  .stat:hover { transform: translateY(-4px); }
   .stat-num {
     display: inline-flex;
     align-items: baseline;
@@ -356,6 +363,7 @@
     background: var(--olive);
     border-radius: 3px;
     margin-bottom: 44px;
+    transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   /* ===== نبذة عني ===== */
@@ -375,9 +383,9 @@
     background: rgba(247, 243, 232, 0.03);
     border-radius: 14px;
     padding: 22px 24px;
-    transition: background 0.35s ease, transform 0.35s ease;
+    transition: background 0.35s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .fact:hover { background: rgba(247, 243, 232, 0.09); transform: translateY(-2px); }
+  .fact:hover { background: rgba(247, 243, 232, 0.09); transform: translateY(-3px); }
   .fact strong { display: block; font-size: 1.5rem; font-weight: 800; }
   .fact span { opacity: 0.85; font-size: 0.95rem; font-weight: 600; }
 
@@ -394,12 +402,12 @@
     overflow: hidden;
     background: var(--olive-dark);
     box-shadow: 0 10px 30px rgba(52, 58, 32, 0.15);
-    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, opacity 0.8s ease;
     cursor: pointer;
   }
   .video:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 16px 38px rgba(52, 58, 32, 0.24);
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(52, 58, 32, 0.25);
   }
   .video img, .video iframe {
     position: absolute;
@@ -427,7 +435,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.35s, background 0.35s;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), background 0.35s;
   }
   .play::before {
     content: '';
@@ -436,7 +444,7 @@
     border-color: transparent transparent transparent var(--olive);
     margin-left: 4px;
   }
-  .video:hover .play { transform: scale(1.08); background: var(--cream); }
+  .video:hover .play { transform: scale(1.1); background: var(--cream); }
 
   /* ===== المشغّل ===== */
   #player {
@@ -498,29 +506,44 @@
     opacity: 0.95;
   }
 
-  /* ===== حركة الظهور المريحة والهادئة ===== */
+  /* ===== حركة الأنيميشن المتكررة والهادئة ===== */
   .fade {
     opacity: 0;
-    transform: translateY(16px);
-    transition: opacity 0.95s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.95s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform: translateY(22px);
+    transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .fade.show {
     opacity: 1;
-    transform: none;
+    transform: translateY(0);
   }
-  .fade.calm-pulse {
-    opacity: 0.45;
-    transform: translateY(10px);
-    transition: opacity 0.9s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.9s cubic-bezier(0.25, 0.8, 0.25, 1);
+  .fade .fact,
+  .fade .stat,
+  .fade .video {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), background 0.35s ease, box-shadow 0.4s ease;
   }
-  .fade.calm-pulse.show {
+  .fade.show .fact,
+  .fade.show .stat,
+  .fade.show .video {
     opacity: 1;
-    transform: none;
+    transform: translateY(0);
   }
+  .fade.show .fact:nth-child(2),
+  .fade.show .stat:nth-child(2),
+  .fade.show .video:nth-child(2) { transition-delay: 0.08s; }
+  .fade.show .fact:nth-child(3),
+  .fade.show .stat:nth-child(3),
+  .fade.show .video:nth-child(3) { transition-delay: 0.16s; }
+  .fade.show .video:nth-child(4) { transition-delay: 0.24s; }
+  .fade.show .video:nth-child(5) { transition-delay: 0.32s; }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .fade, .fade.calm-pulse {
+    .fade,
+    .fade .fact,
+    .fade .stat,
+    .fade .video {
       opacity: 1;
       transform: none;
       transition: none;
@@ -676,7 +699,7 @@
 
 <!-- ===== الافتتاح ===== -->
 <section id="hero" class="tex-light">
-  <div class="wrap fade">
+  <div class="wrap fade show">
     <p class="small">مونتير فيديو</p>
     <h1>أنا يزن</h1>
     <p>أحوّل لقطاتك لفيديوهات مرتبة، سريعة التسليم، وجاهزة للنشر على يوتيوب.</p>
@@ -849,10 +872,11 @@
     setTimeout(finish, reduce ? 1500 : total);
   })();
 
-  // ===== حركة الظهور الهادئة والتنقل بين القوائم =====
+  // ===== أنيميشن التمرير والتنقل بين القوائم =====
   const fades = Array.from(document.querySelectorAll('.fade'));
   const navLinks = Array.from(document.querySelectorAll('header nav a'));
-  let calmTimer = null;
+  let navScrollLockTimer = null;
+  let isNavScrolling = false;
 
   function setActiveNav(hash) {
     navLinks.forEach(a => {
@@ -860,17 +884,30 @@
     });
   }
 
-  function revealVisibleFades() {
+  function animateFadeElement(el) {
+    el.classList.remove('show');
+    void el.offsetWidth;
+    requestAnimationFrame(() => {
+      el.classList.add('show');
+    });
+  }
+
+  function syncFadesOnScroll() {
     const vh = window.innerHeight || document.documentElement.clientHeight;
     fades.forEach(el => {
       const rect = el.getBoundingClientRect();
-      if (rect.top < vh * 0.9 && rect.bottom > vh * 0.05) {
-        el.classList.add('show');
+      const inView = rect.top < vh * 0.88 && rect.bottom > vh * 0.08;
+      const completelyOut = rect.top > vh * 1.05 || rect.bottom < -vh * 0.15;
+
+      if (inView) {
+        if (!el.classList.contains('show')) {
+          el.classList.add('show');
+        }
         const sec = el.closest('section[id]');
-        if (sec && rect.top < vh * 0.55) {
+        if (sec && rect.top < vh * 0.5) {
           setActiveNav('#' + sec.id);
         }
-      } else if (!el.classList.contains('calm-pulse') && (rect.top > vh || rect.bottom < 0)) {
+      } else if (completelyOut && !isNavScrolling && el.id !== 'hero') {
         el.classList.remove('show');
       }
     });
@@ -882,40 +919,42 @@
         e.target.classList.add('show');
         const sec = e.target.closest('section[id]');
         if (sec) setActiveNav('#' + sec.id);
-      } else if (!e.target.classList.contains('calm-pulse')) {
-        e.target.classList.remove('show');
+      } else if (!isNavScrolling) {
+        const rect = e.target.getBoundingClientRect();
+        const vh = window.innerHeight || document.documentElement.clientHeight;
+        if (rect.top > vh || rect.bottom < 0) {
+          e.target.classList.remove('show');
+        }
       }
     });
-  }, { threshold: 0.08 });
+  }, { threshold: 0.1 });
 
   fades.forEach(el => io.observe(el));
-  window.addEventListener('scroll', revealVisibleFades, { passive: true });
-  window.addEventListener('resize', revealVisibleFades, { passive: true });
-  setTimeout(revealVisibleFades, 120);
+  window.addEventListener('scroll', syncFadesOnScroll, { passive: true });
+  window.addEventListener('resize', syncFadesOnScroll, { passive: true });
+  setTimeout(syncFadesOnScroll, 150);
 
-  function calmNavigate(targetSelector) {
-    const target = document.querySelector(targetSelector);
-    if (!target) return;
+  function triggerSectionAnimation(targetSelector) {
+    const section = document.querySelector(targetSelector);
+    if (!section) return;
     setActiveNav(targetSelector);
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    isNavScrolling = true;
+    clearTimeout(navScrollLockTimer);
 
-    const fadeEl = target.querySelector('.fade');
-    if (!fadeEl) return;
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    clearTimeout(calmTimer);
-    fades.forEach(item => item.classList.remove('calm-pulse'));
+    const fadeEl = section.querySelector('.fade');
+    if (fadeEl) {
+      fadeEl.classList.remove('show');
+      setTimeout(() => {
+        animateFadeElement(fadeEl);
+      }, 220);
+    }
 
-    fadeEl.classList.add('calm-pulse');
-    fadeEl.classList.remove('show');
-
-    setTimeout(() => {
-      fadeEl.classList.add('show');
-    }, 240);
-
-    calmTimer = setTimeout(() => {
-      fadeEl.classList.remove('calm-pulse');
-      fadeEl.classList.add('show');
-    }, 1250);
+    navScrollLockTimer = setTimeout(() => {
+      isNavScrolling = false;
+      syncFadesOnScroll();
+    }, 1100);
   }
 
   document.querySelectorAll('header nav a, #hero a.btn').forEach(link => {
@@ -923,7 +962,7 @@
       const href = link.getAttribute('href');
       if (href && href.startsWith('#')) {
         e.preventDefault();
-        calmNavigate(href);
+        triggerSectionAnimation(href);
       }
     });
   });
@@ -945,7 +984,7 @@
       requestAnimationFrame(tick);
       counter.unobserve(el);
     });
-  }, { threshold: 0.5 });
+  }, { threshold: 0.4 });
   document.querySelectorAll('.count').forEach(el => counter.observe(el));
 </script>
 </body>
