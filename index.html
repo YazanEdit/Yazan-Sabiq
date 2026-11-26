@@ -79,7 +79,6 @@
   body.loading { overflow: hidden; }
 
   /* ===== حبيبات الفيلم ===== */
-  /* لتغيير قوة التأثير غيّر opacity: 0.06 (أقل = أخف، أكثر = أوضح) */
   body::after {
     content: '';
     position: fixed;
@@ -121,18 +120,24 @@
     text-decoration: none;
     line-height: 1;
     letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
   }
   .logo .dot { color: #8A9660; }
   .logo img {
-    height: 46px;
+    height: 62px;
+    max-width: 190px;
     width: auto;
+    object-fit: contain;
+    transform: scale(1.14);
+    transform-origin: right center;
     display: block;
   }
   header .wrap {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 68px;
+    height: 76px;
   }
   nav a {
     color: var(--cream);
@@ -149,7 +154,7 @@
     display: flex;
     align-items: center;
     text-align: center;
-    padding-top: 68px;
+    padding-top: 76px;
   }
   #hero .small {
     color: var(--olive);
@@ -378,13 +383,14 @@
   }
 
   /* ===== حركة الظهور ===== */
-  .fade { opacity: 0; transform: translateY(28px); transition: 0.9s ease; }
+  .fade { opacity: 0; transform: translateY(28px); transition: 0.75s ease; }
   .fade.show { opacity: 1; transform: none; }
 
   @media (max-width: 760px) {
     .about-grid { grid-template-columns: 1fr; gap: 32px; }
     nav a { margin-right: 16px; font-size: 0.95rem; }
     section { padding: 72px 0; }
+    .logo img { height: 54px; max-width: 155px; }
   }
 </style>
 </head>
@@ -480,25 +486,11 @@
 </div>
 
 <script>
-  // ============================================
-  // هون بتحط روابط فيديوهاتك على يوتيوب
-  // سطر واحد لكل فيديو، بين علامتي تنصيص، وبعده فاصلة
-  // بتنسخ الرابط من يوتيوب وبتلصقه كما هو
-  // الأسطر اللي بادئة بـ // هي أماكن فاضية: لما بدك تستخدم مكان،
-  // شيل علامتي // من أول السطر وبدّل الكلمة اللي جوا بالرابط
-  // ============================================
   const VIDEOS = [
     "https://youtu.be/-uPuKp2sCe0?si=fKfzMIhrprlq200i",
     "https://youtu.be/FgGKlG4LGcg?si=0XBQxZEQ1CvcpjyH",
     "https://youtu.be/s1rDTSZj65c?si=_P_TBw3_knJG0-gH",
-    // "https://youtu.be/kzowpo-XRFo?si=HulY2HVwt6wauEwN",
-    // "https://youtu.be/kzowpo-XRFo?si=HulY2HVwt6wauEwN",
-    // "الصق رابط الفيديو السادس هنا",
-    // "الصق رابط الفيديو السابع هنا",
-    // "الصق رابط الفيديو الثامن هنا",
-    // "الصق رابط الفيديو التاسع هنا",
   ];
-  // ============================================
 
   function getId(url) {
     const m = url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
@@ -518,7 +510,6 @@
       '<img src="https://i.ytimg.com/vi/' + id + '/hqdefault.jpg" alt="فيديو" loading="lazy">' +
       '<div class="shade"></div><div class="play"></div>';
 
-    // معاينة صامتة عند مرور الماوس
     let preview = null, timer = null;
     if (canHover) {
       d.addEventListener('mouseenter', () => {
@@ -536,7 +527,6 @@
       });
     }
 
-    // فتح المشغّل داخل الموقع عند الضغط
     d.addEventListener('click', () => openPlayer(id));
     box.appendChild(d);
   });
@@ -559,16 +549,14 @@
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closePlayer(); });
 
   // ===== شاشة الدخول =====
-  // هون بتغيّر العبارة اللي بتظهر أول ما يفتح الزائر الموقع
   const INTRO_TEXT = 'أهلاً بك، خلّينا نحوّل لقطاتك إلى قصة تستحق المشاهدة';
 
   (function () {
     const intro = document.getElementById('intro');
     const typed = document.getElementById('typed');
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let i = 0;
-    const WORD_DELAY = 380;   // الوقت بين كل كلمة وكلمة (بالميلي ثانية)
-    const HOLD = 2600;        // كم تبقى الجملة ثابتة بعد ما تكتمل
+    const WORD_DELAY = 380;
+    const HOLD = 2600;
     function finish() {
       intro.classList.add('hide');
       document.body.classList.remove('loading');
@@ -587,10 +575,38 @@
     setTimeout(finish, reduce ? 1500 : total);
   })();
 
+  // ===== حركة الظهور المتكررة عند النزول والتنقل بين القوائم =====
+  const fades = document.querySelectorAll('.fade');
   const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('show');
+      } else {
+        e.target.classList.remove('show');
+      }
+    });
   }, { threshold: 0.12 });
-  document.querySelectorAll('.fade').forEach(el => io.observe(el));
+  fades.forEach(el => io.observe(el));
+
+  function replayFade(targetSelector) {
+    const section = document.querySelector(targetSelector);
+    if (!section) return;
+    const fadeEl = section.querySelector('.fade');
+    if (!fadeEl) return;
+    fadeEl.classList.remove('show');
+    setTimeout(() => {
+      fadeEl.classList.add('show');
+    }, 180);
+  }
+
+  document.querySelectorAll('header nav a, #hero a.btn').forEach(link => {
+    link.addEventListener('click', () => {
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        replayFade(href);
+      }
+    });
+  });
 
   // عدّاد الأرقام
   const counter = new IntersectionObserver((entries) => {
@@ -616,4 +632,4 @@
 </html>
 ```[cite: 1, 2, 3]
 
-بعد رفع الملفين (`favicon.png` و `logo-header.png`) وتحديث `index.html` على GitHub، افتح موقعك في Chrome واضغط `Ctrl + Shift + R`؛ هل ظهرت الخلفية بيضاء حول الشعار في الأعلى أم شفافة؟
+إذا بقي حجم الشعار صغيراً بسبب هوامش بيضاء داخل نفس ملف الصورة، هل تحب أن أقول لك كيف تقص الفراغ المحيط بالشعار بسهولة قبل رفعه؟
